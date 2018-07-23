@@ -211,6 +211,9 @@ class MainWindow(QMainWindow, WindowMixin):
 
         # Actions
         action = partial(newAction, self)
+
+        copyPrev = action('Copy Prev', self.copyPrev)
+
         quit = action('&Quit', self.close,
                       'Ctrl+Q', 'quit', u'Quit application')
 
@@ -399,11 +402,11 @@ class MainWindow(QMainWindow, WindowMixin):
 
         self.tools = self.toolbar('Tools')
         self.actions.beginner = (
-            open, opendir, changeSavedir, openNextImg, openPrevImg, verify, save, save_format, None, create, copy, delete, None,
+            copyPrev, open, opendir, changeSavedir, openNextImg, openPrevImg, verify, save, save_format, None, create, copy, delete, None,
             zoomIn, zoom, zoomOut, fitWindow, fitWidth)
 
         self.actions.advanced = (
-            open, opendir, changeSavedir, openNextImg, openPrevImg, save, save_format, None,
+            copyPrev, open, opendir, changeSavedir, openNextImg, openPrevImg, save, save_format, None,
             createMode, editMode, None,
             hideAll, showAll)
 
@@ -1250,6 +1253,17 @@ class MainWindow(QMainWindow, WindowMixin):
 
         if filename:
             self.loadFile(filename)
+
+    def copyPrev(self):
+        currIndex = self.mImgList.index(self.filePath)
+        if currIndex - 1 >= 0:
+            filename = self.mImgList[currIndex - 1]
+            if filename:
+                unicodeFilePath = ustr(filename)
+                if unicodeFilePath and os.path.exists(unicodeFilePath):
+                    labelFilePath = unicodeFilePath.replace(".jpg", ".xml")
+                    if LabelFile.isLabelFile(labelFilePath):
+                        self.loadLabels(PascalVocReader(labelFilePath).shapes)
 
     def openFile(self, _value=False):
         if not self.mayContinue():
