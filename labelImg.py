@@ -1119,8 +1119,13 @@ class MainWindow(QMainWindow, WindowMixin):
                     relativePath = os.path.join(root, file)
                     path = ustr(os.path.abspath(relativePath))
                     images.append(path)
-        images.sort(key=lambda x: x.lower())
-        return images
+
+        def natural_sort(l): 
+            convert = lambda text: int(text) if text.isdigit() else text.lower() 
+            alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ] 
+            return sorted(l, key=alphanum_key)
+        
+        return natural_sort(images)
 
     def changeSavedirDialog(self, _value=False):
         if self.defaultSaveDir is not None:
